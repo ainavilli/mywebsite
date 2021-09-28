@@ -1,0 +1,33 @@
+# This config file is templatized so that it can be easily customized. Values can be provided with a values.yml file.
+template: true   # required for local templates
+valuesFilePath: ./values.yml
+ 
+resources:
+  - name: npm_repo_jfp_example
+    type: GitRepo
+    configuration:
+      # SCM integration where the repository is located
+      gitProvider: {{ .Values.myRepo.gitProvider }}
+      # Repository path, including org name/repo name
+      path: {{ .Values.myRepo.path }}
+      branches:
+        # Specifies which branches will trigger dependent steps
+        include: master
+ 
+  - name: npm_buildinfo_jfp_example
+    type: BuildInfo
+    configuration:
+      sourceArtifactory: demoArt
+ 
+pipelines:
+  - name: npm_pipeline_jfp_example
+    steps:
+      - name: npm_build_step
+        type: NpmBuild
+        configuration:
+          repositoryName: npm-virtual      # required, npm repository name on artifacctory
+          sourceLocation: .      # required, location of package.json file
+          integrations:
+            - name:  demoArt  # required
+          inputResources:
+            - name: npm_repo_jfp_example         # required
